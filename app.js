@@ -19,24 +19,28 @@
 
 const express = require('express');
 const app = express();
+const { config } = require('dotenv')
 
+config()
 let port = process.env.PORT || 4000;
 
+console.log(process.env.PORT)
 
-app.get('/', (req, res) => {
-  res.send('Welcome to my backend world , aj se backend start!');
+
+app.get('/', (req, res) => { // root level
+    res.send('Welcome to my backend world , aj se backend start!');
 });
 
 const products = [
-    {id: 1 , name: "Product 1", price: 100},
-    {id: 2 , name: "Product 2", price: 200},
-    {id: 3 , name: "Product 3", price: 300},
+    { id: 1, name: "Product 1", price: 100 },
+    { id: 2, name: "Product 2", price: 200 },
+    { id: 3, name: "Product 3", price: 300 },
 ]
 
-app.get('/products', (req , res) =>{
-    res.json({limit: 30 , page: 1 ,products: products});
+app.get('/products', (req, res) => {
+    res.json({ limit: 30, page: 1, products: products });
 })
 
-app.listen(port, () =>{
+app.listen(port, () => {
     console.log("Server is runnning on port " + port);
 })
