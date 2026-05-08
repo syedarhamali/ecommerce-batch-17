@@ -41,6 +41,11 @@ app.get('/products', (req, res) => {
     res.json({ limit: 30, page: 1, products: products });
 })
 
+
+app.post("/add-product" , (req , res) =>{
+    console.log(req.json())
+})
+
 app.listen(port, () => {
     console.log("Server is runnning on port " + port);
 })

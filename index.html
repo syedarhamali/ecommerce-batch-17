@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>POST Request</title>
+</head>
+<body>
+
+<button onclick="sendData()">Send Product</button>
+
+<script>
+    async function sendData() {
+
+        const response = await fetch("http://localhost:3000/add-product", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: "Laptop",
+                price: 50000
+            })
+        });
+
+        const data = await response.text();
+
+        console.log(data);
+    }
+</script>
+
+</body>
+</html>
