@@ -19,12 +19,16 @@
 
 const express = require('express');
 const app = express();
+const cors = require('cors')
 const { config } = require('dotenv')
 
 config()
 let port = process.env.PORT || 4000;
 
-console.log(process.env.PORT)
+// Adds headers: Access-Control-Allow-Origin: *
+app.use(cors())
+
+app.use(express.json())
 
 
 app.get('/', (req, res) => { // root level
@@ -42,8 +46,19 @@ app.get('/products', (req, res) => {
 })
 
 
-app.post("/add-product" , (req , res) =>{
-    console.log(req.json())
+app.post("/add-product", (req, res) => {
+    console.log(req.body.name)
+    console.log(req.body.price)
+
+    const newProduct = {
+        id: products.length + 1,
+        name: req.body.name,
+        price: req.body.price
+    }
+
+    products.push(newProduct)
+
+    res.status(201).json({ message: 'Product added Successfully!' , newProduct })
 })
 
 app.listen(port, () => {
