@@ -35,7 +35,7 @@ app.get('/', (req, res) => { // root level
     res.send('Welcome to my backend world , aj se backend start!');
 });
 
-const products = [
+let products = [
     { id: 1, name: "Product 1", price: 100 },
     { id: 2, name: "Product 2", price: 200 },
     { id: 3, name: "Product 3", price: 300 },
@@ -46,7 +46,8 @@ app.get('/products', (req, res) => {
 })
 
 
-app.post("/add-product", (req, res) => {
+app.post("/products", (req, res) => { 
+
     console.log(req.body.name)
     console.log(req.body.price)
 
@@ -60,6 +61,43 @@ app.post("/add-product", (req, res) => {
 
     res.status(201).json({ message: 'Product added Successfully!' , newProduct })
 })
+
+app.put("/products/:id", (req, res) => { // :id (id will be dynamic)
+    console.log(req.params.id)
+    const id = Number(req.params.id)
+    console.log(req.body.name)
+    console.log(req.body.price)
+
+    const product = products.find((product) => product.id === id)
+
+    if(!product){
+        res.send(404).json({message: 'Product Not Found!'})
+    }
+
+    product.name = req.body.name || product.name
+    product.price = req.body.price || product.price
+
+
+    res.status(200).json({ message: 'Product updated Successfully!' , product})
+})
+
+
+app.delete("/products/:id", (req, res) => { // :id (id will be dynamic)
+    console.log(req.params.id)
+    const id = Number(req.params.id)
+
+    const product = products.find((product) => product.id === id)
+
+    if(!product){
+        res.send(404).json({message: 'Product Not Found!'})
+    }
+
+    products = products.filter((product) => product.id !== id)
+
+
+    res.status(200).json({ message: 'Product deleted Successfully!'})
+})
+
 
 app.listen(port, () => {
     console.log("Server is runnning on port " + port);

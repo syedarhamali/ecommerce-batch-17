@@ -1,31 +1,174 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>POST Request</title>
+    <title>Products CRUD</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        #products {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .card {
+            width: 220px;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .price {
+            color: green;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
 </head>
+
 <body>
 
-<button onclick="sendData()">Send Product</button>
+    <h1>Products</h1>
 
-<script>
-    async function sendData() {
+    <button onclick="getData()">
+        Get Products
+    </button>
 
-        const response = await fetch("http://localhost:3000/add-product", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name: "Laptop",
-                price: 50000
-            })
-        });
+    <div id="products"></div>
 
-        const data = await response.text();
+    <script>
 
-        console.log(data);
-    }
-</script>
+        // GET PRODUCTS
+        async function getData() {
+
+            const response =
+                await fetch(
+                    "http://localhost:3000/products"
+                );
+
+            const data =
+                await response.json();
+
+            const productsDiv =
+                document.getElementById(
+                    "products"
+                );
+
+            productsDiv.innerHTML = "";
+
+            data.products.map((product) => {
+
+                productsDiv.innerHTML += `
+                    <div 
+                        class="card"
+                        onclick="updateProduct(${product.id}, '${product.name}', ${product.price})"
+                    >
+                        <h2>${product.name}</h2>
+
+                        <p class="price">
+                            Rs ${product.price}
+                        </p>
+
+                        <p>
+                            ID: ${product.id}
+                        </p>
+
+                        </div>
+                        <button onclick="deleteItem(${product.id})"> Delete</button>
+                `;
+            });
+        }
+
+
+        // PUT REQUEST
+        async function updateProduct(
+            id,
+            oldName,
+            oldPrice
+        ) {
+
+            // old data collect
+            const newName =
+                prompt(
+                    "Enter New Name",
+                    oldName
+                );
+
+            const newPrice =
+                prompt(
+                    "Enter New Price",
+                    oldPrice
+                );
+
+            if (!newName || !newPrice) {
+                return;
+            }
+
+            const response =
+                await fetch(
+                    `http://localhost:3000/products/${id}`,
+                    {
+                        method: "PUT",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            name: newName,
+                            price:
+                                Number(newPrice)
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            console.log(data);
+
+            // UI refresh
+            getData();
+        }
+
+
+        async function deleteItem(
+            id
+        ) {
+
+            const response =
+                await fetch(
+                    `http://localhost:3000/products/${id}`,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            console.log(data);
+
+            // UI refresh
+            getData();
+        }
+
+    </script>
 
 </body>
+
 </html>
