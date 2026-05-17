@@ -1,174 +1,168 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Products CRUD</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-
-        #products {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .card {
-            width: 220px;
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: 0.3s;
-        }
-
-        .card:hover {
-            transform: scale(1.05);
-        }
-
-        .price {
-            color: green;
-            font-size: 20px;
-            font-weight: bold;
-        }
-    </style>
+    <title>Auth System</title>
 </head>
-
 <body>
 
-    <h1>Products</h1>
+    <h1>Signup</h1>
 
-    <button onclick="getData()">
-        Get Products
+    <input type="text" id="username" placeholder="Username">
+    <br><br>
+
+    <input type="email" id="email" placeholder="Email">
+    <br><br>
+
+    <input type="password" id="password" placeholder="Password">
+    <br><br>
+
+    <button onclick="signup()">
+        Signup
     </button>
 
-    <div id="products"></div>
+    <hr>
+
+    <h1>Login</h1>
+
+    <input type="email" id="loginEmail" placeholder="Email">
+    <br><br>
+
+    <input type="password" id="loginPassword" placeholder="Password">
+    <br><br>
+
+    <button onclick="login()">
+        Login
+    </button>
+
+    <hr>
+
+    <button onclick="getProfile()">
+        Get Profile
+    </button>
+
+    <h2 id="result"></h2>
 
     <script>
 
-        // GET PRODUCTS
-        async function getData() {
+        // SIGNUP
+        async function signup() {
 
-            const response =
-                await fetch(
-                    "http://localhost:3000/products"
-                );
-
-            const data =
-                await response.json();
-
-            const productsDiv =
+            const username =
                 document.getElementById(
-                    "products"
-                );
+                    'username'
+                ).value;
 
-            productsDiv.innerHTML = "";
+            const email =
+                document.getElementById(
+                    'email'
+                ).value;
 
-            data.products.map((product) => {
+            const password =
+                document.getElementById(
+                    'password'
+                ).value;
 
-                productsDiv.innerHTML += `
-                    <div 
-                        class="card"
-                        onclick="updateProduct(${product.id}, '${product.name}', ${product.price})"
-                    >
-                        <h2>${product.name}</h2>
-
-                        <p class="price">
-                            Rs ${product.price}
-                        </p>
-
-                        <p>
-                            ID: ${product.id}
-                        </p>
-
-                        </div>
-                        <button onclick="deleteItem(${product.id})"> Delete</button>
-                `;
-            });
-        }
-
-
-        // PUT REQUEST
-        async function updateProduct(
-            id,
-            oldName,
-            oldPrice
-        ) {
-
-            // old data collect
-            const newName =
-                prompt(
-                    "Enter New Name",
-                    oldName
-                );
-
-            const newPrice =
-                prompt(
-                    "Enter New Price",
-                    oldPrice
-                );
-
-            if (!newName || !newPrice) {
-                return;
-            }
-
-            const response =
-                await fetch(
-                    `http://localhost:3000/products/${id}`,
-                    {
-                        method: "PUT",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            name: newName,
-                            price:
-                                Number(newPrice)
-                        })
-                    }
-                );
+            const response = await fetch(
+                'http://localhost:3000/register',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password
+                    })
+                }
+            );
 
             const data =
                 await response.json();
 
             console.log(data);
 
-            // UI refresh
-            getData();
+            alert(data.message);
         }
 
+        // LOGIN
+        async function login() {
 
-        async function deleteItem(
-            id
-        ) {
+            const email =
+                document.getElementById(
+                    'loginEmail'
+                ).value;
 
-            const response =
-                await fetch(
-                    `http://localhost:3000/products/${id}`,
-                    {
-                        method: "DELETE"
-                    }
-                );
+            const password =
+                document.getElementById(
+                    'loginPassword'
+                ).value;
+
+            const response = await fetch(
+                'http://localhost:3000/login',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password
+                    })
+                }
+            );
 
             const data =
                 await response.json();
 
             console.log(data);
 
-            // UI refresh
-            getData();
+            // Save token
+            localStorage.setItem(
+                'token',
+                data.token
+            );
+
+            alert(data.message);
+        }
+
+        // GET PROFILE
+        async function getProfile() {
+
+            const token =
+                localStorage.getItem(
+                    'token'
+                );
+
+            const response = await fetch(
+                'http://localhost:3000/profile',
+                {
+                    method: 'GET',
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+            const data =
+                await response.json();
+
+            console.log(data);
+
+            document.getElementById(
+                'result'
+            ).innerText =
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                );
         }
 
     </script>
 
 </body>
-
 </html>
